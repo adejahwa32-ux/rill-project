@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>SIAKAD-LITE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+    --primary:#3f51b5;
+    --secondary:#673ab7;
+    --bg:#f2f4ff;
+    --white:#fff;
+    --dark:#333;
+    --danger:#e53935;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+
+body{background:var(--bg);}
+
+.navbar{
+    background:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.logo{font-size:22px;font-weight:700;color:var(--primary)}
+
+button{
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+    background:transparent;
+    color:var(--primary);
+}
+
+button.active{background:var(--primary);color:white}
+
+.container{max-width:1100px;margin:30px auto;padding:0 20px}
+
+.section{display:none}
+.section.active{display:block}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+}
+
+.badge{padding:4px 8px;border-radius:5px;font-size:12px}
+.open{background:#e8eaf6;color:var(--primary)}
+.closed{background:#fdecea;color:var(--danger)}
+
+.btn{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:var(--primary);
+    color:white;
+    border-radius:6px;
+}
+
+.btn:disabled{background:#aaa}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
+
+.stat{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+table{
+    width:100%;
+    background:white;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{padding:10px;border-bottom:1px solid #eee}
+th{background:#f5f6ff}
+
+footer{text-align:center;margin:30px;color:#777}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<div class="logo">SIAKAD-LITE</div>
+<div>
+<span><i class="fa fa-user"></i> Ade Jahwa</span>
+<button id="btn-user" class="active" onclick="view('user')">Mahasiswa</button>
+<button id="btn-admin" onclick="view('admin')">Admin</button>
+</div>
+</nav>
+
+<div class="container">
+
+<section id="user" class="section active">
+<h2>Daftar Matakuliah</h2><br>
+<div class="cards" id="mk-list"></div>
+</section>
+
+<section id="admin" class="section">
+<h2>Panel Akademik</h2><br>
+<div class="stats">
+<div class="stat"><h4>Total Pendaftar</h4><p id="siswa">0</p></div>
+<div class="stat"><h4>Total Matkul</h4><p id="mk">0</p></div>
+<div class="stat"><h4>Total SKS</h4><p id="sks">0</p></div>
+</div>
+
+<table>
+<thead><tr><th>Kode</th><th>Nama</th><th>SKS</th><th>Status</th></tr></thead>
+<tbody id="admin-table"></tbody>
+</table>
+</section>
+
+</div>
+
+<footer>© 2025 — Dibuat oleh <b>Ade Jahwa</b></footer>
+
+<script>
+const matkul=[
+{kode:'TI101',nama:'Dasar Pemrograman',sks:3,status:'Buka',daftar:false},
+{kode:'TI102',nama:'Struktur Data',sks:4,status:'Buka',daftar:false},
+{kode:'SI201',nama:'Sistem Informasi',sks:3,status:'Ditutup',daftar:false}
+];
+
+function daftarMatkul(i){
+if(matkul[i].status==='Buka' && !matkul[i].daftar){
+matkul[i].daftar=true;
+render();
+}
+}
+
+function render(){
+let daftar=0,totalSKS=0;
+mkList.innerHTML='';
+adminTable.innerHTML='';
+
+matkul.forEach((m,i)=>{
+totalSKS+=m.sks;
+if(m.daftar) daftar++;
+
+mkList.innerHTML+=`
+<div class="card">
+<h3>${m.kode}</h3>
+<p>${m.nama}</p>
+<p>${m.sks} SKS</p>
+<span class="badge ${m.status==='Buka'?'open':'closed'}">${m.status}</span>
+<button class="btn" ${m.status!=='Buka'||m.daftar?'disabled':''}
+onclick="daftarMatkul(${i})">
+${m.daftar?'Terdaftar':'Daftar'}
+</button>
+</div>`;
+
+adminTable.innerHTML+=`
+<tr>
+<td>${m.kode}</td>
+<td>${m.nama}</td>
+<td>${m.sks}</td>
+<td>${m.status}</td>
+</tr>`;
+});
+
+siswa.innerText=daftar;
+mk.innerText=matkul.length;
+sks.innerText=totalSKS;
+}
+
+function view(v){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(v).classList.add('active');
+document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+document.getElementById('btn-'+v).classList.add('active');
+}
+
+render();
+</script>
+
+</body>
+</html>
